@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.csg.Attendance.dao.AttendanceDAO;
 import com.csg.Attendance.entity.Attendance;
+import com.csg.Attendance.repository.AttendanceRepository;
 /**
  * 
  * @author Ephraim Makana
@@ -18,7 +19,10 @@ import com.csg.Attendance.entity.Attendance;
 @Service
 public class AttendanceService {
 	@Autowired
-	AttendanceDAO repository;
+	AttendanceRepository repository;
+	
+	@Autowired
+	AttendanceDAO attendanceDAO;
 
 	/**
 	 * 
@@ -42,7 +46,7 @@ public class AttendanceService {
 	 * @return
 	 */
 	public List<Attendance> dailyAttendanceByGrade(String grade, Date date) {
-		return repository.fetchDailyAttendanceByGrade(grade, date);
+		return attendanceDAO.fetchDailyAttendanceByGrade(grade, date);
 	}
 
 	/**
@@ -52,7 +56,7 @@ public class AttendanceService {
 	 * @return
 	 */
 	public List<Attendance> termAttendanceByGrade(String grade, String termNo) {
-		return repository.fetchTermNoAttendanceByGrade(grade, termNo);
+		return attendanceDAO.fetchTermNoAttendanceByGrade(grade, termNo);
 	}
 
 	/**
@@ -62,7 +66,7 @@ public class AttendanceService {
 	 * @return
 	 */
 	public List<Attendance> dailyAttendanceByStudentID(String studentID, Date day) {
-		return repository.fetchDailyAttendanceByStudentID(studentID, day);
+		return attendanceDAO.fetchDailyAttendanceByStudentID(studentID, day);
 	}
 
 	/**
@@ -72,6 +76,6 @@ public class AttendanceService {
 	 * @return
 	 */
 	public List<Attendance> termAttendanceByStudentID(String studentID, String termNo) {
-		return repository.fetchTermNoAttendanceByStudentID(studentID, termNo);
+		return attendanceDAO.fetchTermNoAttendanceByStudentID(studentID, termNo);
 	}
 }

@@ -1,14 +1,19 @@
 package com.csg.Attendance.configuration;
 
 import java.io.Serializable;
+import java.util.Properties;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -30,6 +35,35 @@ public class PersistenceConfig implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	@Value("${spring.datasource.url}")
+	private String databaseUrl;
+	
+	@Value("${spring.datasource.platform}")
+	private String datasourcePlatform;
+	
+	@Value("${spring.datasource.username}")
+	private String username;
+	
+	@Value("${spring.datasource.password}")
+	private String password;
+			
+	@Value("${spring.datasource.driverClassName}")
+	private String driverClassName;
+	
+	@Value("${spring.jpa.database-platform}")
+	private String databasePlatform;
+	
+	@Value("${spring.jpa.hibernate.ddl-auto}")
+	private String hibernateAuto;
+	/**
+	 * 
+	 * @return
+	 */
+	@Bean
+	public SessionFactory setSessionFactory(EntityManagerFactory entityManagerFactory) {
+	    return entityManagerFactory().getNativeEntityManagerFactory().unwrap(SessionFactory.class);
+	} 
+	
 	/**
 	 * 
 	 * @return
@@ -38,12 +72,10 @@ public class PersistenceConfig implements Serializable {
 	public DataSource dataSource() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
-		// dataSource.setDriverClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-
-		dataSource.setUsername("admin");
-		dataSource.setPassword("admin");
-		dataSource.setDriverClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-		dataSource.setUrl("jdbc:mysql://localhost:3306/attendance");
+		dataSource.setUsername(username);
+		dataSource.setPassword(password);
+		dataSource.setDriverClassName(driverClassName);
+		dataSource.setUrl(databaseUrl);
 
 		return dataSource;
 	}
@@ -63,7 +95,7 @@ public class PersistenceConfig implements Serializable {
 	@Bean
 	public JpaVendorAdapter jpaVendorAdapter() {
 		HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-		jpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.MySQL5Dialect");
+		jpaVendorAdapter.setDatabasePlatform(databasePlatform);
 		jpaVendorAdapter.setGenerateDdl(true);
 		return jpaVendorAdapter;
 	}
@@ -72,6 +104,7 @@ public class PersistenceConfig implements Serializable {
 	 * @return
 	 */
 	@Bean
+	@Primary
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean lemfb = new LocalContainerEntityManagerFactoryBean();
 		lemfb.setDataSource(dataSource());
@@ -79,4 +112,14 @@ public class PersistenceConfig implements Serializable {
 		lemfb.setPackagesToScan("com.csg.Attendance.entity");
 		return lemfb;
 	}
+	
+	private final Properties hibernateProperties() {
+        Properties hibernateProperties = new Properties();
+        hibernateProperties.setProperty(
+          "hibernate.hbm2ddl.auto", hibernateAuto);
+        hibernateProperties.setProperty(
+          "hibernate.dialect", databasePlatform);
+ 
+        return hibernateProperties;
+    }
 }
